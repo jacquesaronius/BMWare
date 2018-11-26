@@ -1,7 +1,7 @@
 #ifndef ATAG_H
 #define ATAG_H
 
-#incdlue <stdint.h>
+#include <stdint.h>
 
 typedef enum {
     NONE = 0x00000000,
@@ -11,7 +11,7 @@ typedef enum {
     CMDLINE = 0x54410009,
 } atag_tag_t;
 
-typedef struc {
+typedef struct {
     uint32_t size;
     uint32_t start;
 }mem_t;

@@ -1,5 +1,9 @@
 #include <stddef.h>
 #include <stdint.h>
+#include <kernel/atag.h>
+#include <kernel/interrupts.h>
+#include <kernel/timer.h>
+#include <kernel/mem.h>
 
 static inline void mmio_write(uint32_t reg, uint32_t data)
 {
@@ -104,7 +108,7 @@ void kernel_main(uint32_t r0, uint32_t r1, uint32_t atags)
 
     //Add interrupts. DETERMINE IF QEMU HAS TIMERS FOR RASPPIE2
     mem_init((atag_t *)atags);
-    interrupts.init();
+    interrupt_init();
     timer_init();
     timer_set(1000000);
     puts("Hello, kernel World!\n");

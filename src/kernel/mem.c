@@ -1,7 +1,7 @@
 #include <kernel/mem.h>
 #include <kernel/atag.h>
-#include <common/stdlib.h>
-#include <stdin.h>
+#include <stdlib.h>
+//#include <stdin.h>
 #include <stddef.h>
 
 
