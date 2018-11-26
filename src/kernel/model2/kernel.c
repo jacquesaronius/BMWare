@@ -100,6 +100,14 @@ void kernel_main(uint32_t r0, uint32_t r1, uint32_t atags)
 
     uart_init();
     uart_puts("Welcome to BMWare\r\n");
+    
+
+    //Add interrupts. DETERMINE IF QEMU HAS TIMERS FOR RASPPIE2
+    mem_init((atag_t *)atags);
+    interrupts.init();
+    timer_init();
+    timer_set(1000000);
+    puts("Hello, kernel World!\n");
 
     while (1) {
         uart_putc(uart_getc());
