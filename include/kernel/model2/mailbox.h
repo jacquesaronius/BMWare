@@ -2,9 +2,14 @@
 #define __MAILBOX_H__
 #include <stdint.h>
 #include <stddef.h>
-#define REQUEST 0
+
 #define PROPERTY_CHANNEL 8
-#define RESPONSE_ERROR 0x80000001
+
+typedef enum {
+    REQUEST = 0x00000000,
+    RESPONSE_SUCCESS = 0x80000000,
+    RESPONSE_ERROR = 0x80000001
+} buffer_req_res_code_t;
 
 
 typedef enum {
@@ -59,6 +64,16 @@ typedef struct {
     uint8_t empty: 1;
     uint8_t full:1;
 } mail_status_t;
+
+/*
+ * A buffer that holds many property messages.
+ * The last tag must be a 4 byte zero, and then padding to make the whole thing 4 byte aligned
+ */
+typedef struct {
+    uint32_t size;                      // Size includes the size itself
+    buffer_req_res_code_t req_res_code;
+    uint32_t tags[1];                    // A concatenated sequence of tags. will use overrun to make large enough
+} property_message_buffer_t;
 
 mail_message_t * MAIL0_READ = (mail_message_t *)0xB880;
 mail_status_t * MAIL0_STATUS = (mail_status_t *)0xB898;
