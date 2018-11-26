@@ -5,8 +5,10 @@ CC = ~/gcc-arm-none-eabi-7-2018-q2-update/bin/arm-none-eabi-gcc
 ifeq ($(RASPI_MODEL),1)
 	CPU = arm1176jzf-s
 	DIRECTIVES = -D MODEL_1
+	ARCHDIR = model1
 else
 	CPU = cortex-a7
+	ARCHDIR = model2
 endif
 
 CFLAGS= -mcpu=$(CPU) -fpic -ffreestanding $(DIRECTIVES)
@@ -18,7 +20,7 @@ KER_SRC = ../src/kernel
 KER_HEAD = ../include
 COMMON_SRC = ../src/common
 OBJ_DIR = objects
-KERSOURCES = $(wildcard $(KER_SRC)/*.c)
+KERSOURCES = $(wildcard $(KER_SRC)/$(ARCHDIR)/*.c)
 COMMONSOURCES = $(wildcard $(COMMON_SRC)/*.c)
 ASMSOURCES = $(wildcard $(KER_SRC)/*.S)
 OBJECTS = $(patsubst $(KER_SRC)/%.c, $(OBJ_DIR)/%.o, $(KERSOURCES))
