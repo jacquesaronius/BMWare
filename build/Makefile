@@ -1,4 +1,9 @@
 # Don't use normal gcc, use the arm cross compiler
+ifeq ($(OS), Windows_NT)
+	QEMU = /mnt/c/Program\ Files/qemu/qemu-system-arm.exe
+else
+	QEMU = qemu-system-arm
+endif
 CC = ~/gcc-arm-none-eabi-7-2018-q2-update/bin/arm-none-eabi-gcc
 
 # Set any constants based on the raspberry pi model.  Version 1 has some differences to 2 and 3
@@ -52,4 +57,4 @@ clean:
 	rm $(IMG_NAME)
 
 run: build
-	/mnt/c/Program\ Files/qemu/qemu-system-arm.exe -m 256 -M raspi2 -serial stdio -kernel kernel.img
+	$(QEMU) -m 256 -M raspi2 -serial stdio -kernel kernel.img
