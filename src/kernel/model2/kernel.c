@@ -104,8 +104,8 @@ void kernel_main(uint32_t r0, uint32_t r1, uint32_t atags)
     
     mem_init((atag_t *)atags);
     interrupts_init();
-    timer_init();
-    timer_set(1000000);
+    //timer_init();
+    //timer_set(1000000);
     gpu_init();
     puts("Welcome to BMWare");
     printf("Welcome to BMWare");

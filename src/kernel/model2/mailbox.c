@@ -38,6 +38,7 @@ int send_messages(property_message_tag_t * tags) {
 
     // kmalloc returns a 16 byte aligned address
     msg = kmalloc(bufsize);
+    uart_puts(itoa(bufsize, 10));
     if (!msg)
     {
         return -1;

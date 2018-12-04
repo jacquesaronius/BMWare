@@ -1,8 +1,9 @@
-#ifndef MEM_H
-#define MEM_H
 
+#include <stdint.h>
 #include <kernel/atag.h>
 #include <kernel/list.h>
+#ifndef MEM_H
+#define MEM_H
 
 #define PAGE_SIZE 4096
 #define KERNEL_HEAP_SIZE (1024*1024)
@@ -15,6 +16,7 @@ typedef struct {
 	uint32_t reserved: 29;
 } page_flags_t;
 
+DEFINE_LIST(page);
 
 typedef struct page {
 	uint32_t vaddr_mapped;	// The virtual address that maps to this page	
@@ -30,5 +32,6 @@ void free_page(void * ptr);
 
 void * kmalloc(uint32_t bytes);
 void kfree(void *ptr);
+void print_map();
 
 #endif

@@ -3,6 +3,7 @@
 #include <common/stdlib.h>
 #include <stdint.h>
 #include <stddef.h>
+#include <kernel/model2/kernel.h>
 
 /**
  * Heap Stuff
@@ -30,7 +31,6 @@ static heap_segment_t * heap_segment_list_head;
 extern uint8_t __end;
 static uint32_t num_pages;
 
-DEFINE_LIST(page);
 IMPLEMENT_LIST(page);
 
 static page_t * all_pages_array;
@@ -45,15 +45,19 @@ void mem_init(atag_t * atags) {
     mem_size = get_mem_size(atags);
     num_pages = mem_size / PAGE_SIZE;
 
-    // Allocate space for all those pages' metadata.  Start this block just after the kernel image is finished
+    // Allocate space for all those pages' metadata.  Start this block just after the stack
     page_array_len = sizeof(page_t) * num_pages;
-    all_pages_array = (page_t *)&__end;
+    all_pages_array = (page_t *)((uint32_t)&__end + KERNEL_STACK_SIZE);
     bzero(all_pages_array, page_array_len);
     INITIALIZE_LIST(free_pages);
+    
+    // Find where the page metadata ends and round up to the nearest page
+    page_array_end = (uint32_t)all_pages_array + page_array_len;
+    page_array_end += page_array_end % PAGE_SIZE ? PAGE_SIZE - (page_array_end % PAGE_SIZE) : 0;
 
     // Iterate over all pages and mark them with the appropriate flags
-    // Start with kernel pages
-    kernel_pages = ((uint32_t)&__end) / PAGE_SIZE;
+    // Start with kernel pages, stacks, and page metadata
+    kernel_pages = (page_array_end) / PAGE_SIZE;
     for (i = 0; i < kernel_pages; i++) {
         all_pages_array[i].vaddr_mapped = i * PAGE_SIZE;    // Identity map the kernel pages
         all_pages_array[i].flags.allocated = 1;
@@ -73,8 +77,10 @@ void mem_init(atag_t * atags) {
 
 
     // Initialize the heap
-    page_array_end = (uint32_t)&__end + page_array_len;
     heap_init(page_array_end);
+    print_map();
+
+
 
 }
 
@@ -122,6 +128,7 @@ static void heap_init(uint32_t heap_start) {
 void * kmalloc(uint32_t bytes) {
     heap_segment_t * curr, *best = NULL;
     int diff, best_diff = 0x7fffffff; // Max signed int
+    print_map();
 
     // Add the header to the number of bytes we need and make the size 16 byte aligned
     bytes += sizeof(heap_segment_t);
@@ -154,7 +161,8 @@ void * kmalloc(uint32_t bytes) {
     }
 
     best->is_allocated = 1;
-
+    uart_puts(itoa(best->segment_size, 10));
+    print_map();
     return best + 1;
 }
 
@@ -163,12 +171,14 @@ void kfree(void *ptr) {
 
     if (!ptr)
         return;
-
-    seg = ptr - sizeof(heap_segment_t);
+    uart_puts("Before free\n");
+    print_map();
+    /*seg = ptr - sizeof(heap_segment_t);
+    //uart_puts(itoa(seg->next->next->segment_size, 10));
     seg->is_allocated = 0;
 
     // try to coalesce segements to the left
-    while(seg->prev != NULL && !seg->prev->is_allocated) {
+    /*while(seg->prev != NULL && !seg->prev->is_allocated) {
         seg->prev->next = seg->next;
         seg->next->prev = seg->prev;
         seg->prev->segment_size += seg->segment_size;
@@ -179,5 +189,25 @@ void kfree(void *ptr) {
         seg->next->next->prev = seg;
         seg->next = seg->next->next;
         seg->segment_size += seg->next->segment_size;
+    }*/
+    uart_puts("After free\n");
+    print_map();
+}
+
+void print_map()
+{
+    heap_segment_t * curr;
+    curr = heap_segment_list_head;
+    uart_puts("---MEMORY MAP---\n");
+    while(curr != NULL)
+    {
+        uart_puts("Is allocated\t");
+        uart_puts(itoa(curr->is_allocated, 10));
+        uart_puts("\tSegment size");
+        uart_puts(itoa(curr->segment_size, 10));
+        uart_putc('\n');
+
+        curr = curr->next;
     }
+    
 }
