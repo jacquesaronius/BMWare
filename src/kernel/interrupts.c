@@ -1,5 +1,5 @@
 #include <kernel/interrupts.h>
-#include <kernel/kerio.h>
+#include <kernel/stdio.h>
 #include <common/stdlib.h>
 
 static interrupt_registers_t * interrupt_regs;

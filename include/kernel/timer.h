@@ -2,7 +2,7 @@
 #include <kernel/peripheral.h>
 #ifndef TIMER_H
 #define TIMER_H
-
+#define SYSTEM_TIMER_OFFSET 0x3000 
 #define SYSTEM_TIMER_BASE (SYSTEM_TIMER_OFFSET + PERIPHERAL_BASE)
 
 void timer_init(void);

@@ -1,4 +1,5 @@
-#include "kernel/model2/mailbox.h"
+#include <kernel/model2/mailbox.h>
+#include <common/stdlib.h>
 static uint32_t get_value_buffer_len(property_message_tag_t * tag) {
     switch(tag->proptag) {
         case FB_ALLOCATE_BUFFER: 
@@ -81,4 +82,36 @@ int send_messages(property_message_tag_t * tags) {
 
     kfree(msg);
     return 0;
+}
+
+mail_message_t mailbox_read(int channel) {
+    mail_status_t stat;
+    mail_message_t res;
+
+    // Make sure that the message is from the right channel
+    do {
+        // Make sure there is mail to recieve
+        do {
+            stat = *MAIL0_STATUS;
+        } while (stat.empty);
+
+        // Get the message
+        res = *MAIL0_READ;
+    } while (res.channel != channel);
+
+    return res;
+}
+
+void mailbox_send(mail_message_t msg, int channel) {
+    mail_status_t stat;
+    msg.channel = channel;
+    
+
+    // Make sure you can send mail
+    do {
+        stat = *MAIL0_STATUS;
+    } while (stat.full);
+
+    // send the message
+    *MAIL0_WRITE = msg;
 }

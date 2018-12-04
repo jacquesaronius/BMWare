@@ -2,8 +2,16 @@
 #define __MAILBOX_H__
 #include <stdint.h>
 #include <stddef.h>
+#include <kernel/mem.h>
+#include <kernel/peripheral.h>
 
+#define MAILBOX_OFFSET 0xB880
+#define MAILBOX_BASE PERIPHERAL_BASE + MAILBOX_OFFSET
+#define MAIL0_READ (((mail_message_t *)(0x00 + MAILBOX_BASE)))
+#define MAIL0_STATUS (((mail_status_t *)(0x18 + MAILBOX_BASE)))
+#define MAIL0_WRITE (((mail_message_t *)(0x20 + MAILBOX_BASE)))
 #define PROPERTY_CHANNEL 8
+#define FRAMEBUFFER_CHANNEL 1
 
 typedef enum {
     REQUEST = 0x00000000,
@@ -75,41 +83,12 @@ typedef struct {
     uint32_t tags[1];                    // A concatenated sequence of tags. will use overrun to make large enough
 } property_message_buffer_t;
 
-mail_message_t * MAIL0_READ = (mail_message_t *)0xB880;
-mail_status_t * MAIL0_STATUS = (mail_status_t *)0xB898;
-mail_message_t * MAIL0_WRITE = (mail_message_t *)0xB8A0;
+int send_messages(property_message_tag_t * tags);
+mail_message_t mailbox_read(int channel);
+void mailbox_send(mail_message_t msg, int channel);
 
-mail_message_t mailbox_read(int channel) {
-    mail_status_t stat;
-    mail_message_t res;
 
-    // Make sure that the message is from the right channel
-    do {
-        // Make sure there is mail to recieve
-        do {
-            stat = *MAIL0_STATUS;
-        } while (stat.empty);
 
-        // Get the message
-        res = *MAIL0_READ;
-    } while (res.channel != channel);
-
-    return res;
-}
-
-void mailbox_send(mail_message_t msg, int channel) {
-    mail_status_t stat;
-    msg.channel = channel;
-    
-
-    // Make sure you can send mail
-    do {
-        stat = *MAIL0_STATUS;
-    } while (stat.full);
-
-    // send the message
-    *MAIL0_WRITE = msg;
-}
 
 
 

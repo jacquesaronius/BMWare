@@ -1,6 +1,6 @@
 #include <kernel/mem.h>
 #include <kernel/atag.h>
-#include <stdlib.h>
+#include <common/stdlib.h>
 //#include <stdin.h>
 #include <stddef.h>
 

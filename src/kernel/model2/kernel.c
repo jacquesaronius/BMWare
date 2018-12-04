@@ -1,27 +1,5 @@
-#include <stddef.h>
-#include <stdint.h>
-#include <kernel/atag.h>
-#include <kernel/interrupts.h>
-#include <kernel/timer.h>
-#include <kernel/mem.h>
-
-static inline void mmio_write(uint32_t reg, uint32_t data)
-{
-    *(volatile uint32_t*)reg = data;
-}
-
-static inline uint32_t mmio_read(uint32_t reg)
-{
-    return *(volatile uint32_t*)reg;
-}
-
-// Loop <delay> times in a way that the compiler won't optimize away
-static inline void delay(int32_t count)
-{
-    asm volatile("__delay_%=: subs %[count], %[count], #1; bne __delay_%=\n"
-            : "=r"(count): [count]"0"(count) : "cc");
-}
-
+#include <kernel/model2/kernel.h>
+#include <kernel/gpu.h>
 enum
 {
     // The GPIO registers base address.
@@ -52,6 +30,22 @@ enum
     UART0_ITOP   = (UART0_BASE + 0x88),
     UART0_TDR    = (UART0_BASE + 0x8C),
 };
+static inline void mmio_write(uint32_t reg, uint32_t data)
+{
+    *(volatile uint32_t*)reg = data;
+}
+
+static inline uint32_t mmio_read(uint32_t reg)
+{
+    return *(volatile uint32_t*)reg;
+}
+
+// Loop <delay> times in a way that the compiler won't optimize away
+static inline void delay(int32_t count)
+{
+    asm volatile("__delay_%=: subs %[count], %[count], #1; bne __delay_%=\n"
+            : "=r"(count): [count]"0"(count) : "cc");
+}
 
 void uart_init()
 {
@@ -106,12 +100,16 @@ void kernel_main(uint32_t r0, uint32_t r1, uint32_t atags)
     uart_puts("Welcome to BMWare\r\n");
     
 
-    //Add interrupts. DETERMINE IF QEMU HAS TIMERS FOR RASPPIE2
+    
+    
     mem_init((atag_t *)atags);
-    interrupt_init();
+    interrupts_init();
     timer_init();
     timer_set(1000000);
-    puts("Hello, kernel World!\n");
+    gpu_init();
+    puts("Welcome to BMWare");
+    printf("Welcome to BMWare");
+    //puts("Hello, kernel World!\n");
 
     while (1) {
         uart_putc(uart_getc());
