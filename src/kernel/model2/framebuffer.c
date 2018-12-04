@@ -1,6 +1,7 @@
 #include <kernel/model2/framebuffer.h>
 #include <kernel/model2/mailbox.h>
 #include <kernel/gpu.h>
+#include <kernel/model2/kernel.h>
 int framebuffer_init(void) {
     property_message_tag_t tags[5];
 
@@ -17,7 +18,9 @@ int framebuffer_init(void) {
 
 
     // Send over the initialization
-    if (send_messages(tags) != 0) {
+    int res = send_messages(tags);
+    if (res != 0) {
+        uart_puts("CAN'T INIT FRAMEBUFFER\n");
         return -1;
     }
 
@@ -27,7 +30,7 @@ int framebuffer_init(void) {
     fbinfo.chars_height = fbinfo.height / CHAR_HEIGHT;
     fbinfo.chars_x = 0;
     fbinfo.chars_y = 0;
-    fbinfo.pitch = fbinfo.width*BYTES_PER_PIXEL;
+    fbinfo.pitch = fbinfo.width * BYTES_PER_PIXEL;
 
     // request a framebuffer
     tags[0].proptag = FB_ALLOCATE_BUFFER;
@@ -36,13 +39,14 @@ int framebuffer_init(void) {
     tags[0].value_buffer.fb_allocate_align = 16;
     tags[1].proptag = NULL_TAG;
 
-
-    if (send_messages(tags) != 0) {
+    res = send_messages(tags);
+    if (res != 0) {
+        uart_puts("CAN'T GET FRAMEBUFFER\n");
         return -1;
     }
 
     fbinfo.buf = tags[0].value_buffer.fb_allocate_res.fb_addr;
     fbinfo.buf_size = tags[0].value_buffer.fb_allocate_res.fb_size;
-
+    uart_puts(itoa(res, 10));
     return 0;
 }

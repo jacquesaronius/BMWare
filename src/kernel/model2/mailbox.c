@@ -1,5 +1,6 @@
 #include <kernel/model2/mailbox.h>
 #include <common/stdlib.h>
+#include <kernel/model2/kernel.h>
 static uint32_t get_value_buffer_len(property_message_tag_t * tag) {
     switch(tag->proptag) {
         case FB_ALLOCATE_BUFFER: 
@@ -22,6 +23,7 @@ int send_messages(property_message_tag_t * tags) {
     property_message_buffer_t * msg;
     mail_message_t mail;
     uint32_t bufsize = 0, i, len, bufpos;
+    
    
     // Calculate the sizes of each tag
     for (i = 0; tags[i].proptag != NULL_TAG; i++) {
@@ -37,7 +39,9 @@ int send_messages(property_message_tag_t * tags) {
     // kmalloc returns a 16 byte aligned address
     msg = kmalloc(bufsize);
     if (!msg)
+    {
         return -1;
+    }
 
     msg->size = bufsize;
     msg->req_res_code = REQUEST;
@@ -55,18 +59,20 @@ int send_messages(property_message_tag_t * tags) {
     msg->tags[bufpos] = 0;
 
     // Send the message
-    mail.data = ((uint32_t)msg) >>4;
+    mail.data = ((uint32_t)msg) >> 4;
     
     mailbox_send(mail, PROPERTY_CHANNEL);
     mail = mailbox_read(PROPERTY_CHANNEL);
 
 
     if (msg->req_res_code == REQUEST) {
+
         kfree(msg);
         return 1;
     }
     // Check the response code
     if (msg->req_res_code == RESPONSE_ERROR) {
+        
         kfree(msg);
         return 2;
     }

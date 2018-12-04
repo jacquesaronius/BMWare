@@ -15,7 +15,6 @@ typedef struct {
 	uint32_t reserved: 29;
 } page_flags_t;
 
-DEFINE_LIST(page);
 
 typedef struct page {
 	uint32_t vaddr_mapped;	// The virtual address that maps to this page	
