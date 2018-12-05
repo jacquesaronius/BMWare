@@ -3,6 +3,9 @@
 #ifndef STDLIB_H
 #define STDLIB_H
 
+#define MIN(x,y) ((x < y ? x : y))
+#define MAX(x,y) ((x < y ? y : x))
+
 typedef struct divmod_result {
     uint32_t div;
     uint32_t mod;

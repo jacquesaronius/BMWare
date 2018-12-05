@@ -22,10 +22,12 @@ void timer_set(uint32_t usecs) {
 }
 
 
-__attribute__ ((optimize(0))) void udelay (uint32_t usecs) {
-    volatile uint32_t curr = timer_regs->counter_low;
+/*__attribute__ ((optimize(0))) */void udelay (uint32_t usecs) {
+    /*volatile uint32_t curr = timer_regs->counter_low;
     volatile uint32_t x = timer_regs->counter_low - curr;
     while (x < usecs) {
         x = timer_regs->counter_low - curr;
-    }
+    }*/
+
+    for (int i = 0; i < 600000000 * usecs; i++);
 }

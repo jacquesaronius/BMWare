@@ -1,5 +1,6 @@
 #include <kernel/model2/kernel.h>
 #include <kernel/gpu.h>
+#include <kernel/bomb.h>
 enum
 {
     // The GPIO registers base address.
@@ -96,6 +97,7 @@ void kernel_main(uint32_t r0, uint32_t r1, uint32_t atags)
     (void) r1;
     (void) atags;
 
+    int run = 1;
     uart_init();
     uart_puts("Welcome to BMWare\r\n");
     
@@ -104,14 +106,33 @@ void kernel_main(uint32_t r0, uint32_t r1, uint32_t atags)
     
     mem_init((atag_t *)atags);
     interrupts_init();
-    //timer_init();
+    timer_init();
     //timer_set(1000000);
     gpu_init();
+    process_init();
     puts("Welcome to BMWare\n");
-    //puts("Hello, kernel World!\n");
 
-    while (1) {
-        uart_putc(uart_getc());
-        uart_putc('\n');
+    uart_puts("--Commands--\n");
+    uart_puts("Press 1 to clear the screen\n");
+    uart_puts("Press 2 to drop the bomb\n");
+    uart_puts("Press 3 to view our sick logo\n");
+    while (run) {
+        auto c = uart_getc();
+        switch(c)
+        {
+            case '1':
+                gpu_clear();
+                break;
+            case '2':
+                create_kernel_thread(drop_bombs, "DROP_BOMBS", 10);
+                schedule();
+                break;
+            case '3':
+                gpu_clear();
+                uart_puts("Printing logo\n");
+                makeLogo();
+                break;
+        }
+        uart_putc(c);
     }
 }

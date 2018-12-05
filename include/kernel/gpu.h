@@ -19,4 +19,6 @@ void write_pixel(uint32_t x, uint32_t y, const pixel_t * pixel);
 
 void gpu_putc(char c);
 
+void gpu_clear(void);
+
 #endif
