@@ -19,4 +19,5 @@ void uart_putc(unsigned char c);
 unsigned char uart_getc();
 void uart_puts(const char* str);
 void kernel_main(uint32_t r0, uint32_t r1, uint32_t atags);
+void print_menu();
 

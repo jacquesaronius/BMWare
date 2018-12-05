@@ -111,17 +111,16 @@ void kernel_main(uint32_t r0, uint32_t r1, uint32_t atags)
     gpu_init();
     process_init();
     puts("Welcome to BMWare\n");
+    print_menu();
 
-    uart_puts("--Commands--\n");
-    uart_puts("Press 1 to clear the screen\n");
-    uart_puts("Press 2 to drop the bomb\n");
-    uart_puts("Press 3 to view our sick logo\n");
+
     while (run) {
         auto c = uart_getc();
         switch(c)
         {
             case '1':
                 gpu_clear();
+                print_menu();
                 break;
             case '2':
                 create_kernel_thread(drop_bombs, "DROP_BOMBS", 10);
@@ -132,7 +131,21 @@ void kernel_main(uint32_t r0, uint32_t r1, uint32_t atags)
                 uart_puts("Printing logo\n");
                 makeLogo();
                 break;
+            default:
+                gpu_putc(c);
         }
         uart_putc(c);
     }
+}
+
+void print_menu()
+{
+    uart_puts("--Commands--\n");
+    uart_puts("Press 1 to clear the screen\n");
+    uart_puts("Press 2 to drop the bomb\n");
+    uart_puts("Press 3 to view our sick logo\n");
+    puts("--Commands--\n");
+    puts("Press 1 to clear the screen\n");
+    puts("Press 2 to drop the bomb\n");
+    puts("Press 3 to view our sick logo\n");
 }

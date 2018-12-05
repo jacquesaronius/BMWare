@@ -138,7 +138,7 @@ void print_bomb(int distance)
 void drop_bombs(void)
 {
     int i;
-    for (i = 0; i < 600; i++)
+    for (i = 0; i < 60; i++)
     {
         uart_puts(itoa(i, 10));
         print_bomb(i);
