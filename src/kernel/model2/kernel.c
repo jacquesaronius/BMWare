@@ -107,8 +107,7 @@ void kernel_main(uint32_t r0, uint32_t r1, uint32_t atags)
     //timer_init();
     //timer_set(1000000);
     gpu_init();
-    puts("Welcome to BMWare");
-    printf("Welcome to BMWare");
+    puts("Welcome to BMWare\n");
     //puts("Hello, kernel World!\n");
 
     while (1) {

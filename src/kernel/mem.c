@@ -203,7 +203,7 @@ void print_map()
     {
         uart_puts("Is allocated\t");
         uart_puts(itoa(curr->is_allocated, 10));
-        uart_puts("\tSegment size");
+        uart_puts("\tSegment size\t");
         uart_puts(itoa(curr->segment_size, 10));
         uart_putc('\n');
 
