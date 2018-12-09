@@ -19,18 +19,18 @@ void process_init(void)
     process_control_block_t * main_pcb;
     INITIALIZE_LIST(run_queue);
     INITIALIZE_LIST(all_proc_list);
-     // Allocate and initailize the block
+     
     main_pcb = kmalloc(sizeof(process_control_block_t));
     main_pcb->stack_page = (void *)&__end;
     main_pcb->pid = NEW_PID;
     memcpy(main_pcb->proc_name, "Init", 5);
 
-    // Add self to all process list.  It is already running, so dont add it to the run queue
+    
     append_pcb_list(&all_proc_list, main_pcb);
 
     current_process = main_pcb;
 
-    // Set the timer to go off after 10 ms
+    
     timer_set(10000);
 }
 
@@ -38,21 +38,21 @@ void schedule(void) {
     DISABLE_INTERRUPTS();
     process_control_block_t * new_thread, * old_thread;
 
-    // If nothing on the run queue, the current process should just continue
+    
     if (size_pcb_list(&run_queue) == 0) {
         ENABLE_INTERRUPTS();
         return;
     }
 
-    // Get the next thread to run.  For now we are using round-robin
+    
     new_thread = pop_pcb_list(&run_queue);
     old_thread = current_process;
     current_process = new_thread;
 
-    // Put the current thread back in the run queue
+    
     append_pcb_list(&run_queue, old_thread);
 
-    // Context Switch
+    
     switch_to_thread(old_thread, new_thread);
     ENABLE_INTERRUPTS();
 }
@@ -61,24 +61,24 @@ void create_kernel_thread(kthread_function_f thread_func, char * name, int name_
     process_control_block_t * pcb;
     proc_saved_state_t * new_proc_state;
 
-    // Allocate and initialize the pcb
+
     pcb = kmalloc(sizeof(process_control_block_t));
     pcb->stack_page = alloc_page();
     pcb->pid = NEW_PID;
     memcpy(pcb->proc_name, name, MIN(name_len,19));
     pcb->proc_name[MIN(name_len,19)+1] = 0;
 
-    // Get the location the stack pointer should be in when this is run
+    
     new_proc_state = pcb->stack_page + PAGE_SIZE - sizeof(proc_saved_state_t);
     pcb->saved_state = new_proc_state;
 
-    // Set up the stack that will be restored during a context switch
+    
     bzero(new_proc_state, sizeof(proc_saved_state_t));
-    new_proc_state->lr = (uint32_t)thread_func;     // lr is used as return address in switch_to_thread
-    new_proc_state->sp = (uint32_t)reap;            // When the thread function returns, this reaper routine will clean it up
-    new_proc_state->cpsr = 0x13 | (8 << 1);         // Sets the thread up to run in supervisor mode with irqs only
+    new_proc_state->lr = (uint32_t)thread_func;     
+    new_proc_state->sp = (uint32_t)reap;            
+    new_proc_state->cpsr = 0x13 | (8 << 1);         
 
-    // add the thread to the lists
+    
     append_pcb_list(&all_proc_list, pcb);
     append_pcb_list(&run_queue, pcb);
 }
@@ -87,20 +87,20 @@ static void reap(void) {
     DISABLE_INTERRUPTS();
     process_control_block_t * new_thread, * old_thread;
 
-    // If nothing on the run queue, there is nothing to do now. just loop
+    
     while (size_pcb_list(&run_queue) == 0);
 
-    // Get the next thread to run.  For now we are using round-robin
+    
     new_thread = pop_pcb_list(&run_queue);
     old_thread = current_process;
     current_process = new_thread;
 
-    // Free the resources used by the old process.  Technically, we are using dangling pointers here, but since interrupts are disabled and we only have one core, it
-    // should still be fine
+    
+    
     free_page(old_thread->stack_page);
     kfree(old_thread);
 
-    // Context Switch
+    
     switch_to_thread(old_thread, new_thread);
 }
 

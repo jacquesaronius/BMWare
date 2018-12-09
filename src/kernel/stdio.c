@@ -21,7 +21,7 @@ void puts(const char * str) {
 void gets(char * buf, int buflen) {
     int i;
     char c;
-    // Leave a spot for null char in buffer
+    
     for (i = 0; (c = getc()) != '\r' && buflen > 1; i++, buflen--) {
         putc(c);
         buf[i] = c;

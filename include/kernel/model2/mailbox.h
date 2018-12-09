@@ -78,9 +78,9 @@ typedef struct {
  * The last tag must be a 4 byte zero, and then padding to make the whole thing 4 byte aligned
  */
 typedef struct {
-    uint32_t size;                      // Size includes the size itself
+    uint32_t size;                      
     buffer_req_res_code_t req_res_code;
-    uint32_t tags[1];                    // A concatenated sequence of tags. will use overrun to make large enough
+    uint32_t tags[1];                    
 } property_message_buffer_t;
 
 int send_messages(property_message_tag_t * tags);

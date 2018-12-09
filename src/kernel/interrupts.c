@@ -14,7 +14,7 @@ void interrupts_init(void) {
     interrupt_regs = (interrupt_registers_t *)INTERRUPTS_PENDING;
 	bzero(handlers, sizeof(interrupt_handler_f) * NUM_IRQS);
 	bzero(clearers, sizeof(interrupt_clearer_f) * NUM_IRQS);
-	interrupt_regs->irq_basic_disable = 0xffffffff; // disable all interrupts
+	interrupt_regs->irq_basic_disable = 0xffffffff; 
 	interrupt_regs->irq_gpu_disable1 = 0xffffffff;
 	interrupt_regs->irq_gpu_disable2 = 0xffffffff;
     move_exception_vector();
@@ -27,7 +27,7 @@ void interrupts_init(void) {
 void irq_handler(void) {
     int j; 
 	for (j = 0; j < NUM_IRQS; j++) {
-        // If the interrupt is pending and there is a handler, run the handler
+        
         if (IRQ_IS_PENDING(interrupt_regs, j)  && (handlers[j] != 0)) {
 			clearers[j]();
 			ENABLE_INTERRUPTS();
@@ -94,7 +94,7 @@ void unregister_irq_handler(irq_number_t irq_num) {
         irq_pos = irq_num - 64;
         handlers[irq_num] = 0;
         clearers[irq_num] = 0;
-        // Setting the disable bit clears the enabled bit
+        
         interrupt_regs->irq_basic_disable |= (1 << irq_pos);
     }
     else if (IRQ_IS_GPU2(irq_num)) {

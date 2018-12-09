@@ -3,14 +3,14 @@
 #include <kernel/bomb.h>
 enum
 {
-    // The GPIO registers base address.
-    GPIO_BASE = 0x3F200000, // for raspi2 & 3, 0x20200000 for raspi1
+    
+    GPIO_BASE = 0x3F200000,
 
     GPPUD = (GPIO_BASE + 0x94),
     GPPUDCLK0 = (GPIO_BASE + 0x98),
 
-    // The base address for UART.
-    UART0_BASE = 0x3F201000, // for raspi2 & 3, 0x20201000 for raspi1
+    
+    UART0_BASE = 0x3F201000, 
 
     UART0_DR     = (UART0_BASE + 0x00),
     UART0_RSRECR = (UART0_BASE + 0x04),
@@ -41,7 +41,7 @@ static inline uint32_t mmio_read(uint32_t reg)
     return *(volatile uint32_t*)reg;
 }
 
-// Loop <delay> times in a way that the compiler won't optimize away
+
 static inline void delay(int32_t count)
 {
     asm volatile("__delay_%=: subs %[count], %[count], #1; bne __delay_%=\n"
